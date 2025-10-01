@@ -29,6 +29,7 @@ public class KeyChallengeData
 
 public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
 {
+    [SerializeField] private TimingBar m_timingBar;
     [SerializeField] private ChallengeBar m_challengeBar;
     [SerializeField] private KeyChallengeData m_currentChallenge;
     private int m_numberKeyPressed;
@@ -55,13 +56,8 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
                 m_numberKeyPressed++;
                 if (m_numberKeyPressed >= m_currentChallenge.NumberKeys)
                 {
-                    GenerateChallenge();
+                    m_numberKeyPressed = m_currentChallenge.NumberKeys;
                 }
-            }
-            else
-            {
-                //TODO
-                //Handle miss damage and turn to enemy
             }
         }
     }
@@ -69,6 +65,38 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     public void Uninstall()
     {
         
+    }
+
+    public void OnPressAttack(DamageZone damageZone)
+    {
+        if (damageZone != DamageZone.None)
+        {
+            if (m_numberKeyPressed >= m_currentChallenge.NumberKeys)
+            {
+                //Debug.Log($"Hit damage zone {damageZone.ToString()}");
+                ResetChallenge();
+            }
+            else
+            {
+                //TODO:
+                //Miss atk
+                Debug.Log("MISS ATK!");
+                ResetChallenge();
+            }
+        }
+        else
+        {
+            //TODO:
+            //Miss atk
+            Debug.Log("MISS ATK!");
+            ResetChallenge();
+        }
+    }
+
+    public void ResetChallenge()
+    {
+        m_timingBar.ResetTimingBar();
+        GenerateChallenge();
     }
     
     

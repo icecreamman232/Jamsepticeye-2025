@@ -104,7 +104,7 @@ namespace SGGames.Script.Core
         private void FindActions()
         {
             m_moveAction = InputSystem.actions.FindAction("Move");
-            //m_attackAction = InputSystem.actions.FindAction("Attack");
+            m_attackAction = InputSystem.actions.FindAction("Attack");
             //m_reloadAction = InputSystem.actions.FindAction("Reload");
             //m_pauseAction = InputSystem.actions.FindAction("Pause");
         }
@@ -112,7 +112,7 @@ namespace SGGames.Script.Core
         private void RegisterAction()
         {
             m_moveAction.performed += OnMoveInputPerformed;
-            // m_attackAction.performed += AttackActionOnPerformed;
+            m_attackAction.performed += AttackActionOnPerformed;
             // m_reloadAction.performed += OnReloadInputPerformed;
             // m_pauseAction.performed += OnPauseInputPerformed;
         }
@@ -120,7 +120,7 @@ namespace SGGames.Script.Core
         private void UnregisterAction()
         {
             m_moveAction.performed -= OnMoveInputPerformed;
-            // m_attackAction.performed -= AttackActionOnPerformed;
+            m_attackAction.performed -= AttackActionOnPerformed;
             // m_reloadAction.performed -= OnReloadInputPerformed;
             // m_pauseAction.performed -= OnPauseInputPerformed;
         }

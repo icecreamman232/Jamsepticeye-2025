@@ -55,7 +55,10 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
 
     public void ReadyBattle()
     {
-        m_startBattleButton.gameObject.SetActive(true);
+        GenerateChallenge();
+        m_challengeBar.ShowChallenge(m_currentChallenge);
+        m_timingBar.StartAndActivate();
+        m_isActivated = true;
     }
 
     private void StartBattle()

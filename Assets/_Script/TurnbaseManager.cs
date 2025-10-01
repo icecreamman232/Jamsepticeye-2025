@@ -11,16 +11,24 @@ public class TurnbaseManager : MonoBehaviour
 {
     [SerializeField] private Turn m_currentTurn;
     [SerializeField] private Animator m_hitVfxAnimator;
+    [SerializeField] private KeyChallengeManager m_keyChallengeManager;
+    [SerializeField] private WaveManager m_waveManager;
+    
     [SerializeField] private Transform m_playerTransform;
     [SerializeField] private Transform m_enemyTransform;
-    [SerializeField] private KeyChallengeManager m_keyChallengeManager;
-    
     [SerializeField] private Health m_playerHealth;
     [SerializeField] private Health m_enemyHealth;
     [SerializeField] private Weapon m_playerWeapon;
     [SerializeField] private Weapon m_enemyWeapon;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
+
+    public void AssignEnemy(GameObject enemy)
+    {
+        m_enemyTransform = enemy.transform;
+        m_enemyHealth = enemy.GetComponent<Health>();
+        m_enemyWeapon = enemy.GetComponent<Weapon>();
+    }
     
     public void HitEnemy()
     {
@@ -40,6 +48,9 @@ public class TurnbaseManager : MonoBehaviour
 
         if (m_enemyHealth.IsDead)
         {
+            m_waveManager.NextEnemyInWave();
+            yield return new WaitForSeconds(0.2f);
+            m_keyChallengeManager.ReadyBattle();
             yield break;
         }
         

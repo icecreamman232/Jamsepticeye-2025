@@ -14,6 +14,11 @@ public class TurnbaseManager : MonoBehaviour
     [SerializeField] private Transform m_playerTransform;
     [SerializeField] private Transform m_enemyTransform;
     [SerializeField] private KeyChallengeManager m_keyChallengeManager;
+    
+    [SerializeField] private Health m_playerHealth;
+    [SerializeField] private Health m_enemyHealth;
+    [SerializeField] private Weapon m_playerWeapon;
+    [SerializeField] private Weapon m_enemyWeapon;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
     
@@ -30,6 +35,13 @@ public class TurnbaseManager : MonoBehaviour
     private IEnumerator OnHittingEnemy()
     {
         yield return StartCoroutine(PlayHitEffect(m_enemyTransform));
+        m_enemyHealth.TakeDamage(m_playerWeapon.GetFinalDamage());
+        yield return new WaitForSeconds(0.2f);
+
+        if (m_enemyHealth.IsDead)
+        {
+            yield break;
+        }
         
         HitPlayer();
     }
@@ -37,6 +49,13 @@ public class TurnbaseManager : MonoBehaviour
     private IEnumerator OnHittingPlayer()
     {
         yield return StartCoroutine(PlayHitEffect(m_playerTransform));
+        m_playerHealth.TakeDamage(m_enemyWeapon.GetFinalDamage());
+        yield return new WaitForSeconds(0.2f);
+
+        if (m_playerHealth.IsDead)
+        {
+            yield break;
+        }
         
         m_keyChallengeManager.ReadyBattle();
     }

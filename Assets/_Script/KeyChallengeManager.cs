@@ -32,9 +32,11 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     [SerializeField] private TimingBar m_timingBar;
     [SerializeField] private ChallengeBar m_challengeBar;
     [SerializeField] private KeyChallengeData m_currentChallenge;
+    [SerializeField] private TurnbaseManager m_turnbaseManager;
+    [SerializeField] private ButtonController m_startBattleButton;
     private int m_numberKeyPressed;
     private const int k_startNumberKeys = 4;
-    
+    private bool m_isActivated = false;
     public void Install()
     {
         ServiceLocator.RegisterService<KeyChallengeManager>(this);
@@ -42,11 +44,39 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
         m_currentChallenge = new KeyChallengeData();
         m_currentChallenge.NumberKeys = k_startNumberKeys;
         m_currentChallenge.KeyChallenge = new KeyType[k_startNumberKeys];
+        
+        //Setup
+        m_timingBar.StopAndReset();
+        m_challengeBar.HideChallenge();
+        m_isActivated = false;
+        
+        m_startBattleButton.OnButtonClick = StartBattle;
+    }
+
+    public void ReadyBattle()
+    {
+        m_startBattleButton.gameObject.SetActive(true);
+    }
+
+    private void StartBattle()
+    {
+        m_startBattleButton.gameObject.SetActive(false);
         GenerateChallenge();
+        m_challengeBar.ShowChallenge(m_currentChallenge);
+        m_timingBar.StartAndActivate();
+        m_isActivated = true;
+    }
+
+    private void AfterAttack()
+    {
+        m_timingBar.StopAndReset();
+        m_challengeBar.HideChallenge();
+        m_isActivated = false;
     }
 
     private void OnMoveInputCallback(Vector2 input)
     {
+        if (!m_isActivated) return;
         var keyType = InputToKey(input);
         if (keyType != KeyType.COUNT_BASIC)
         {
@@ -69,12 +99,13 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
 
     public void OnPressAttack(DamageZone damageZone)
     {
+        if (!m_isActivated) return;
         if (damageZone != DamageZone.None)
         {
             if (m_numberKeyPressed >= m_currentChallenge.NumberKeys)
             {
-                //Debug.Log($"Hit damage zone {damageZone.ToString()}");
-                ResetChallenge();
+                AfterAttack();
+                m_turnbaseManager.HitEnemy();
             }
             else
             {

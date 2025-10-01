@@ -12,6 +12,7 @@ public enum DamageZone
 
 public class TimingBar : MonoBehaviour
 {
+    [SerializeField] private CanvasGroup m_canvasGroup;
     [SerializeField] private KeyChallengeManager m_keyChallengeManager;
     [SerializeField] [Range(0.3f, 1.2f)] private float m_speed;
     [SerializeField] private RectTransform m_damageBar;
@@ -22,6 +23,8 @@ public class TimingBar : MonoBehaviour
     [SerializeField] private Vector2 m_lowDamageZone;
     [SerializeField] private Vector2 m_averageDamageZone;
     [SerializeField] private Vector2 m_highDamageZone;
+
+    private bool m_isRunning = true;
     
     private void Start()
     {
@@ -32,6 +35,19 @@ public class TimingBar : MonoBehaviour
     public void ResetTimingBar()
     {
         m_slider.value = 0;
+    }
+
+    public void StopAndReset()
+    {
+        m_isRunning = false;
+        m_canvasGroup.alpha = 0;
+        ResetTimingBar();
+    }
+
+    public void StartAndActivate()
+    {
+        m_isRunning = true;
+        m_canvasGroup.alpha = 1;
     }
 
     private void SetupDamageZone()
@@ -84,6 +100,7 @@ public class TimingBar : MonoBehaviour
 
     private void Update()
     {
+        if(!m_isRunning) return;
         m_slider.value += (m_speed * Time.deltaTime);
         if (m_slider.value >= 1)
         {

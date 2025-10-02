@@ -34,6 +34,9 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     [SerializeField] private KeyChallengeData m_currentChallenge;
     [SerializeField] private TurnbaseManager m_turnbaseManager;
     [SerializeField] private ButtonController m_startBattleButton;
+    [SerializeField] private GameEvent m_gameEvent;
+    
+    
     private int m_numberKeyPressed;
     private const int k_startNumberKeys = 4;
     private bool m_isActivated = false;
@@ -45,34 +48,34 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
         m_currentChallenge.NumberKeys = k_startNumberKeys;
         m_currentChallenge.KeyChallenge = new KeyType[k_startNumberKeys];
         
+        m_gameEvent.AddListener(OnReceiveGameEvent);
+        
         //Setup
         m_timingBar.StopAndReset();
+        m_timingBar.Hide();
         m_challengeBar.HideChallenge();
         m_isActivated = false;
-        
-        m_startBattleButton.OnButtonClick = StartBattle;
-    }
 
-    public void ReadyBattle()
+    }
+    
+    
+    public void Uninstall()
+    {
+        m_gameEvent.RemoveListener(OnReceiveGameEvent);
+    }
+    
+    public void NewBattle()
     {
         GenerateChallenge();
         m_challengeBar.ShowChallenge(m_currentChallenge);
         m_timingBar.StartAndActivate();
         m_isActivated = true;
     }
-
-    private void StartBattle()
-    {
-        m_startBattleButton.gameObject.SetActive(false);
-        GenerateChallenge();
-        m_challengeBar.ShowChallenge(m_currentChallenge);
-        m_timingBar.StartAndActivate();
-        m_isActivated = true;
-    }
-
+    
     private void AfterAttack()
     {
         m_timingBar.StopAndReset();
+        m_timingBar.Hide();
         m_challengeBar.HideChallenge();
         m_isActivated = false;
     }
@@ -80,6 +83,11 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     private void OnMoveInputCallback(Vector2 input)
     {
         if (!m_isActivated) return;
+        if (m_numberKeyPressed >= m_currentChallenge.NumberKeys)
+        {
+            return;
+        }
+        
         var keyType = InputToKey(input);
         if (keyType != KeyType.COUNT_BASIC)
         {
@@ -93,11 +101,6 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
                 }
             }
         }
-    }
-
-    public void Uninstall()
-    {
-        
     }
 
     public void OnPressAttack(DamageZone damageZone)
@@ -114,16 +117,19 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
             {
                 //TODO:
                 //Miss atk
-                Debug.Log("MISS ATK!");
+                Debug.Log("MISS ATK 1!");
                 ResetChallenge();
+                m_turnbaseManager.HitPlayer();
             }
         }
         else
         {
+            m_timingBar.StopAndReset();
             //TODO:
             //Miss atk
-            Debug.Log("MISS ATK!");
-            ResetChallenge();
+            Debug.Log("MISS ATK 2!");
+            //ResetChallenge();
+            m_turnbaseManager.HitPlayer();
         }
     }
 
@@ -137,6 +143,7 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     [ContextMenu("Test")]
     private void GenerateChallenge()
     {
+        Debug.Log("GenerateChallenge");
         for(int i=0; i<m_currentChallenge.NumberKeys; i++)
         {
             m_currentChallenge.KeyChallenge[i] = (KeyType)UnityEngine.Random.Range(0, (int)KeyType.COUNT_BASIC);
@@ -199,5 +206,14 @@ public class KeyChallengeManager : MonoBehaviour, IGameService, IBootStrap
     private bool CheckChallenge(KeyType keyType)
     {
         return m_currentChallenge.KeyChallenge[m_numberKeyPressed] == keyType;
+    }
+    
+    
+    private void OnReceiveGameEvent(GameEventType gameEventType)
+    {
+        if (gameEventType == GameEventType.WaveFinished)
+        {
+            AfterAttack();
+        }
     }
 }

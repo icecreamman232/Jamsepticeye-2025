@@ -35,17 +35,23 @@ public class TimingBar : MonoBehaviour
     public void ResetTimingBar()
     {
         m_slider.value = 0;
+        Debug.Log("Reset timing bar");
+    }
+
+    public void Hide()
+    {
+        m_canvasGroup.alpha = 0;
     }
 
     public void StopAndReset()
     {
         m_isRunning = false;
-        m_canvasGroup.alpha = 0;
         ResetTimingBar();
     }
 
     public void StartAndActivate()
     {
+        ResetTimingBar();
         m_isRunning = true;
         m_canvasGroup.alpha = 1;
     }

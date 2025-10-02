@@ -48,9 +48,15 @@ public class TurnbaseManager : MonoBehaviour
 
         if (m_enemyHealth.IsDead)
         {
-            m_waveManager.NextEnemyInWave();
-            yield return new WaitForSeconds(0.2f);
-            m_keyChallengeManager.ReadyBattle();
+            if (m_waveManager.NextEnemyInWave())
+            {
+                yield return new WaitForSeconds(0.2f);
+                m_keyChallengeManager.NewBattle();
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
             yield break;
         }
         
@@ -68,7 +74,7 @@ public class TurnbaseManager : MonoBehaviour
             yield break;
         }
         
-        m_keyChallengeManager.ReadyBattle();
+        m_keyChallengeManager.NewBattle();
     }
 
     private IEnumerator PlayHitEffect(Transform target)

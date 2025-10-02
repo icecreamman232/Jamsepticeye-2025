@@ -24,7 +24,9 @@ public class WaveManager : MonoBehaviour
         
         if (m_currentEnemyIndex >= m_currentWave.Enemies.Length)
         {
+            Debug.Log("Wave finished");
             m_gameEvent.Raise(GameEventType.WaveFinished);
+            m_gameEvent.Raise(GameEventType.WonBattle);
             return false;
         }
         

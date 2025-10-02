@@ -10,6 +10,8 @@ public class GameEvent : ScriptableEvent<GameEventType>
 
 public enum GameEventType
 {
-    StartBattle,
+    NewBattle,
     WaveFinished,
+    WonBattle,
+    LostBattle,
 }

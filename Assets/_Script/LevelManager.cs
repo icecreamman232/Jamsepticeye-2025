@@ -35,7 +35,7 @@ public class LevelManager : MonoBehaviour, IGameService, IBootStrap
     
     private void OnReceiveGameEvent(GameEventType gameEventType)
     {
-        if (gameEventType == GameEventType.WaveFinished)
+        if (gameEventType == GameEventType.NewBattle)
         {
             m_startBattleButton.gameObject.SetActive(true);
         }
